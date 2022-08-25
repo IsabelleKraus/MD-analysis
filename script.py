@@ -459,4 +459,83 @@ plt.ylim(0,max_rmsf_lig+2)
 plt.legend()
 plt.savefig('PLOTS/RMSF_lig_1_traj2.png', dpi=300, bbox_inches='tight', pad_inches=0.2)
 
+#pl.rcParams['figure.dpi'] = 300 # reset size of plot window
+
+
+###RMSD for protein chain A,C and lig2
+##Here plotted vs Frame
+#Use frame_indices=range(0, 20000, 50) for calculating only every 50th frame; see line 115
+#nofit=False for protein to see degree of intern movements
+data_rmsd_proAC = pt.rmsd(traj, ref=ref, mask=":110-162,165-219@CA", nofit=False)# Calculates RMSD for protein-backbone-CA; change mask for pro-residues! 
+#data_rmsd_proB = pt.rmsd(traj, ref=ref, mask=":58-107@CA", nofit=True)
+#data_rmsd_proC = pt.rmsd(traj, ref=ref, mask=":110-162@CA", nofit=True)
+#data_rmsd_proD = pt.rmsd(traj, ref=ref, mask=":165-219@CA", nofit=True)
+  
+                                                                          # changed for 2 ligands and residue-numbers: 
+data_rmsd_lig1 = pt.rmsd(traj, ref=ref, mask=":222-226&!@H=", nofit=True)		# Calculates RMSD for ligand; change mask for residue-number 
+data_rmsd_lig2 = pt.rmsd(traj, ref=ref, mask=":227-230&!@H=", nofit=True)
+
+frame_num=len(data_rmsd_proAC)
+m1_pro=max(data_rmsd_proAC)
+m1_lig1=max(data_rmsd_lig1)                                         # changed for 2 ligands
+m1_lig2=max(data_rmsd_lig2)
+m1_lig1_lig2=max(m1_lig1, m1_lig2)
+
+#Save RMSD-data as csv
+a=np.arange(1,frame_num+1,1)
+data_frames=np.column_stack((a, data_rmsd_proAC , data_rmsd_lig2))     #changed
+np.savetxt('PLOTS/RMSD_Frames_chAC.csv', data_frames, header='Frame\tprotein_chainA\tprotein_chainC\tligand2', fmt='%1.1f', delimiter='\t')
+#RMSD-plot and save as RMSD_frames.png
+plt.figure(0)                                                       # New Figure
+plt.plot(data_rmsd_proAC, label='Protein Chain A and C')
+#plt.plot(data_rmsd_proB, label='Protein Chain B')
+#plt.plot(data_rmsd_proC, label='Protein Chain C')
+#plt.plot(data_rmsd_proD, label='Protein Chain D')
+
+plt.plot(data_rmsd_lig2, label='Ligand 2')		                    # Label legend
+#plt.plot(data_rmsd_lig2, label='Ligand 2')                          # added for 2nd ligand, may change into sepparate plot
+plt.xlabel('Frame', fontweight ='bold', fontsize=10)
+plt.ylabel('RMSD (Angstrom)', fontweight ='bold', fontsize=10)		  # Label x and y axes 
+plt.xlim(0,frame_num)				                                        # Range of x-axis
+plt.xticks((np.arange(0,frame_num+1,500)), fontsize=10)              # Interval of ticks x-axis 
+plt.yticks(fontsize=10)
+plt.ylim(0,m1_lig2+3)			                                    # range till max of lig-rmsd + 3 is used #changed
+plt.legend(fontsize=12)
+plt.savefig('PLOTS/RMSD_frames_chAC.png', dpi=300)
+
+
+###RMSD for protein chaind A, C and ligand2
+##Here plotted vs Time
+T1=frame_num*0.1                                                       # Simulation Time. 0.02 has to be modified if ntwx changed. calculation 0.02: ntwx*dt/1000
+Time=np.arange(0,T1,0.1)                                               # generate array for Time. Here 50 and 0.02 are chosen: (ntslim/ntwx/MD-Time)
+data_pro_timeA=np.column_stack((Time,data_rmsd_proAC))                   # data Time, rmsd-pro
+#data_pro_timeB=np.column_stack((Time,data_rmsd_proB))
+#data_pro_timeC=np.column_stack((Time,data_rmsd_proC))
+#data_pro_timeD=np.column_stack((Time,data_rmsd_proD))
+
+#data_lig1_time=np.column_stack((Time,data_rmsd_lig1))                   # data Time, rmsd-lig1                   # changed for 2 ligands
+data_lig2_time=np.column_stack((Time,data_rmsd_lig2))
+data_time_all=np.column_stack((Time,data_rmsd_proAC,data_rmsd_lig2))       # data Time, rmsd-pro, rmsd-lig
+#Save RMSD-data as csv
+np.savetxt('PLOTS/RMSD_Time_chAC.csv', data_time_all, header='Time\tprotein_chainAC\tligand1', fmt='%1.1f', delimiter='\t')
+#RMSD-plot vs Time and save as RMSD_Time.png
+plt.figure(1)                                                         # New Figure
+plt.plot(data_pro_timeA.T[0], data_pro_timeA.T[1], label='Protein Chain A and C')	    # plot protein_RMSD and label as Protein
+#plt.plot(data_pro_timeB.T[0], data_pro_timeB.T[1], label='Protein Chain B')
+#plt.plot(data_pro_timeC.T[0], data_pro_timeC.T[1], label='Protein Chain C')
+#plt.plot(data_pro_timeD.T[0], data_pro_timeD.T[1], label='Protein Chain D')
+
+#plt.plot(data_lig1_time.T[0], data_lig1_time.T[1], label='Ligand 1')	# plot protein_RMSD and label as Ligand     # changed for 2 ligands
+plt.plot(data_lig2_time.T[0], data_lig2_time.T[1], label='Ligand 2')
+plt.xlabel('Time (ns)', fontweight ='bold', fontsize=10)
+plt.ylabel('RMSD (Angstrom)', fontweight ='bold', fontsize=10)		# Label x and y axes
+plt.xlim(0,T1)				                                            # range of x-axis
+plt.xticks((np.arange(0,T1+1,50)), fontsize=10)                    # Interval of ticks x-axis
+plt.yticks(fontsize=10)
+plt.ylim(0,m1_lig2+3)			                                        # range till max of lig-rmsd + 3 is used
+plt.legend()
+plt.savefig('PLOTS/RMSD_Time_chAC.png', dpi=300)
+
+
+
 
