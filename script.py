@@ -50,8 +50,8 @@ traj = pt.load('prod1.nc', top='z_solv.prmtop')				# If too many frames, the tra
 #load input coordinates as reference structure for RMSD-calculation
 ref = pt.load('z_solv.inpcrd', top=traj.top)
 #Modify Trajectory 
-#align trajectory to input structure (ref)
-traj.superpose(mask=':1-221@CA', ref=ref)                           # changed with :1-221, to ignore ligand (peptide) atoms
+#align trajectory to input protein structure (ref)
+traj.superpose(mask=':1-221@CA', ref=ref)                           # changed with :1-221, to ignore ligand (peptide) atoms!
 
 ###############add: traj2 for superposing to chain B,D and A####################################
 
