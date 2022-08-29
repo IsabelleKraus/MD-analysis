@@ -160,9 +160,9 @@ plt.legend()
 plt.savefig('PLOTS/RMSF_lig_1.png', dpi=300, bbox_inches='tight', pad_inches=0.2)
 
 ###RMSF-ligand2-atoms,save data and gerenerate RMSF-Plot:
-rmsf_data_lig_2 = pt.rmsf(traj, mask=":227-230&!@H= byres") 
+rmsf_data_lig_2 = pt.rmsf(traj, mask=":58-61&!@H= byres") 
 max_rmsf_lig_2=max(rmsf_data_lig_2.T[1])
-np.savetxt('PLOTS/RMSF_lig_2.csv', rmsf_data_lig, fmt='%1.1f', delimiter='\t')
+np.savetxt('PLOTS/RMSF_lig_2.csv', rmsf_data_lig_2, fmt='%1.1f', delimiter='\t')
 min_a_num=min(rmsf_data_lig_2.T[0])
 max_a_num=max(rmsf_data_lig_2.T[0])
 
@@ -174,7 +174,7 @@ plt.ylabel('RMSF (Angstrom)', fontweight ='bold', fontsize=10)
 plt.xlim(min_a_num-1,max_a_num+1)
 plt.xticks((np.arange(min_a_num,max_a_num+1)), rotation=50, fontsize=10)
 plt.yticks(fontsize=10)
-plt.ylim(0,max_rmsf_lig+2)
+plt.ylim(0,max_rmsf_lig_2+2)
 plt.legend()
 plt.savefig('PLOTS/RMSF_lig_2.png', dpi=300, bbox_inches='tight', pad_inches=0.2)
 
