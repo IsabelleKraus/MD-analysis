@@ -53,7 +53,7 @@ ref = pt.load('z_solv.inpcrd', top=traj.top)
 #align trajectory to input protein structure (ref)
 traj.superpose(mask=':1-221@CA', ref=ref)                           # changed with :1-221, to ignore ligand (peptide) atoms!
 
-###############add: traj2 for superposing to chain B,D and A####################################
+###############add: traj2 for defined superposing ####################################
 
 ###RMSD for protein and ligand
 ##Here plotted vs Frame
