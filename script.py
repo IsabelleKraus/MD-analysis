@@ -234,14 +234,19 @@ column=list(df1.iloc[:,0])                                        # Create list 
 cm=cm = 1/2.54  # centimeters in inches
 fig1, ax = plt.subplots(figsize=(50*cm,30*cm))   
                  # changed figure dimensions
-ax.imshow(df1.iloc[:,1:], cmap='Blues',vmin=0, vmax=1, aspect='auto')
+ax.imshow(df1.iloc[:,1::5], cmap='Blues',vmin=0, vmax=1, aspect='auto')
 ax.set_yticks(np.arange(df1.shape[0]))
 ax.set_yticklabels(list(df1.iloc[:,0]), fontsize=10)
 plt.setp(ax.get_xticklabels(), ha="center", va="center")
 plt.xlabel('Frame', fontsize=14, fontweight='bold')
 ax.tick_params(top=False, bottom=True,labeltop=False, labelbottom=True)   # label of x-axis on bottom
+
+_label_list = [1000,2000,3000,4000,5000]
+ax.set_xticks([0,200,400,600,800,1000])
+ax.set_xticklabels(x_label_list)
+
 fig1.tight_layout()
-plt.savefig('PLOTS/H-bond-lig_1-pro.png', dpi=600)
+plt.savefig('PLOTS/H-bond-lig_1-pro.png', dpi=300)
 #Save Hbond matrix Lig-pro to csv file
 df1.to_csv('PLOTS/Hbonds-Ligand_1.csv', sep='\t')
 #Save Hbond occupancy to csv
@@ -535,6 +540,61 @@ plt.yticks(fontsize=10)
 plt.ylim(0,m1_lig2+3)			                                        # range till max of lig-rmsd + 3 is used
 plt.legend()
 plt.savefig('PLOTS/RMSD_Time_chAC.png', dpi=300)
+
+
+
+#RMSF-Protein-Plot with RMSF for all chains and right residue numbers 
+
+seq= "NMVHPNVICDGCNGPVVGTRYKCSVCPDYDLCSVCEGKGLHRGHTKLAFPSPF"    # aligned sequence (every chain just differs in length)
+aa= list(seq)
+res =[]
+
+res_num=120                                                     # to concat residue number and residue name
+for j in aa:
+    j = j + " " + str(res_num)
+    res.append(j)
+    res_num += 1
+
+traj.superpose(mask=':1-221@CA', ref=ref)   
+rmsf_dataA = pt.rmsf(traj, mask=":1-55@CA byres")
+rmsf_dataB = pt.rmsf(traj, mask=":58-107@CA byres")
+rmsf_dataC = pt.rmsf(traj, mask=":110-162@CA byres")
+rmsf_dataD = pt.rmsf(traj, mask=":165-219@CA byres")
+
+residues=max(rmsf_dataA.T[0])
+max_rmsf=max(rmsf_dataA.T[1])
+np.savetxt('PLOTS/RMSF.csv', rmsf_data, fmt='%1.1f', delimiter='\t')
+#Plot RMSF
+plt.figure(2)                                                             
+
+range_A= range(120,173)                                         # residue ranges of protein chains
+range_B= range(124,172)
+range_C= range(121,172)
+range_D= range(120,173)
+
+plt.plot(range_A, rmsf_dataA.T[1], label="Chain A",linewidth=0.7)
+plt.plot(range_B, rmsf_dataB.T[1], label="Chain B",linewidth=0.7)
+plt.plot(range_C, rmsf_dataC.T[1], label="Chain C",linewidth=0.7)
+plt.plot(range_D, rmsf_dataD.T[1], label="Chain D",linewidth=0.7)
+
+
+plt.xlabel('Residue', fontweight ='bold', fontsize=10)
+plt.ylabel('RMSF (Angstrom)', fontweight ='bold', fontsize=10)
+plt.xlim(119,173)
+plt.ylim(0,max_rmsf+2)
+
+plt.xticks((np.arange(120,173,4)),rotation=50, fontsize=8, labels=res[::4]) 
+plt.yticks(fontsize=10)
+plt.legend()
+
+
+
+
+#_label_list = [1000,2000,3000,4000,5000]
+#ax.set_xticks([0,200,400,600,800,1000])
+#ax.set_xticklabels(x_label_list)
+
+plt.savefig('PLOTS/RMSF_b.png', dpi=300, bbox_inches='tight', pad_inches=0.2)
 
 
 
